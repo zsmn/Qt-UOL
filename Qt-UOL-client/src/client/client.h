@@ -9,7 +9,7 @@ class Client : public QObject
 {
     Q_OBJECT
 public:
-    Client(QString name);
+    Client(QString ip,int porta, QString name);
     void sendMsg(std::string msg);
 
 public slots:

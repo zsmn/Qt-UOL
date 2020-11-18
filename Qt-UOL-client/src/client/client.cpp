@@ -1,10 +1,10 @@
 #include "client.h"
 
-Client::Client(QString name)
+Client::Client(QString ip, int porta, QString name)
 {
     _socket = new QTcpSocket(this);
     _name = name;
-    _socket->connectToHost(QHostAddress("127.0.0.1"), 9999);
+    _socket->connectToHost(QHostAddress(ip), porta);
 
     connect(_socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
     connect(_socket, SIGNAL(connected()), this, SLOT(onConnected()));

@@ -1,12 +1,13 @@
-#include <QCoreApplication>
-
-#include <src/client/client.h>
+#include <QApplication>
+#include <iostream>
+#include "login.h"
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    QApplication a(argc, argv);
+    Login login;
+    login.show();
 
-    Client client("Pedro Jorge");
 
     return a.exec();
 }
