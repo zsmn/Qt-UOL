@@ -9,7 +9,7 @@ class Client : public QObject
 {
     Q_OBJECT
 public:
-    Client();
+    Client(QString name);
     void sendMsg(std::string msg);
 
 public slots:
@@ -18,6 +18,7 @@ public slots:
 
 private:
     QTcpSocket *_socket;
+    QString _name;
 };
 
 #endif // CLIENT_H

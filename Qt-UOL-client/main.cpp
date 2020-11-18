@@ -6,11 +6,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    Client client;
-
-    for(int x = 0; x < 5; x++){
-        client.sendMsg("str");
-    }
+    Client client("Pedro Jorge");
 
     return a.exec();
 }

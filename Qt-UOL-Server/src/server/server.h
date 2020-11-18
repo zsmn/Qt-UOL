@@ -13,10 +13,9 @@ public:
     explicit Server(QObject *parent = 0);
 
 public slots:
-    void newConnection();
     void sendWelcomeMessage();
     void broadcast(QString);
-    void rcvMsg(QTcpSocket *socket);
+    void rcvMsg(QObject *socket);
     void sendMsg(QString msg, QTcpSocket *socket);
 
 private:
@@ -24,7 +23,7 @@ private:
     QTcpSocket *socket;
     QSignalMapper *signalmapper;
 
-    QVector<QTcpSocket *> _sockets;
+    QVector<std::pair<QTcpSocket *, QString>> _sockets;
 };
 
 #endif // SERVER_H

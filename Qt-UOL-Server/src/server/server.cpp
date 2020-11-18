@@ -10,7 +10,7 @@ Server::Server(QObject *parent) :
             this, SLOT(sendWelcomeMessage()));
 
 
-
+    signalmapper = new QSignalMapper();
 
     if(!server->listen(QHostAddress::Any, 9999))
     {
@@ -22,28 +22,7 @@ Server::Server(QObject *parent) :
     }
 }
 
-void Server::newConnection()
-{
-    // need to grab the socket
-    socket = server->nextPendingConnection();
 
-    // Erasing non-connected sockets
-    for(int x = 0; x < _sockets.size(); x++){
-        if(_sockets.at(x)->state() == QAbstractSocket::UnconnectedState){
-            QTcpSocket *socket = _sockets.at(x);
-            _sockets.removeAt(x);
-            delete socket;
-            x--;
-        }
-    }
-
-    socket->write(QByteArray(QString("Hello client allies %1\r\n").arg(_sockets.size()).toStdString().c_str()));
-    socket->flush();
-
-    socket->waitForBytesWritten(3000);
-
-    _sockets.push_back(socket);
-}
 
 
 void Server::sendWelcomeMessage()
@@ -51,9 +30,6 @@ void Server::sendWelcomeMessage()
 
 
     socket = server->nextPendingConnection();
-//    QString msg(socket->readAll());
-
-//    std::cout<<msg.toStdString()<<std::endl;
 
     connect(socket, SIGNAL(readyRead()), signalmapper, SLOT(map())); // Signal mapper is defined in the class definition and created in the constructor, see QSignalMapper.
 
@@ -62,37 +38,55 @@ void Server::sendWelcomeMessage()
     connect(signalmapper, SIGNAL(mapped(QObject *)), this, SLOT(rcvMsg(QObject *)));
 
     for(int x = 0; x < _sockets.size(); x++){
-        if(_sockets.at(x)->state() == QAbstractSocket::UnconnectedState){
-            QTcpSocket *socket = _sockets.at(x);
+        if(_sockets.at(x).first->state() == QAbstractSocket::UnconnectedState){
+            QTcpSocket *socket = _sockets.at(x).first;
             _sockets.removeAt(x);
             delete socket;
             x--;
         }
     }
 
-    socket->write(QByteArray(QString("Hello,").toStdString().c_str()));
-    socket->waitForBytesWritten(3000);
 
-    _sockets.push_back(socket);
+    _sockets.push_back(std::make_pair(socket, ""));
 }
 
-void Server::rcvMsg(QTcpSocket *socket){
+void Server::rcvMsg(QObject *socket){
+     QTcpSocket *clientSocket = qobject_cast<QTcpSocket *>(socket);
 
+    QString msg(clientSocket->readAll());
+    clientSocket->peerAddress();
+    std::cout<<clientSocket->peerPort()<<std::endl;
 
-    QString msg(socket->readAll());
-
+    std::cout<<msg.toStdString()<<std::endl;
     QStringList listWords = msg.split(":");
-    QString neededWord = listWords.value(0);
-    msg="";
-    for(int i=1;i<listWords.size();i++){
-        msg+=listWords.value(i);
+    QString neededWord = listWords.value(1);
+    QString msgSnd="";
+    std::cout<<neededWord.toStdString()<<std::endl;
+    for(int i=2;i<listWords.size();i++){
+        msgSnd+=listWords.value(i);
     }
-    if(neededWord == "broadcast"){
-        broadcast(msg);
-    }else{
-//        sendMsg(msg,); precisa descobrir pra quem deve enviar pra depois enviar
+    if(neededWord.contains("broadcast")){ // se vem uma mensagem de broadcast, envia pra todo mundo
+        std::cout<<"entrei broad"<<std::endl;
+        broadcast(msgSnd);
+    }else if(neededWord.contains("config")){ // se vem uma mensagem de config, faz a atribuição do nome ao socket
+        std::cout<<"entrei config"<<std::endl;
+        for(int x = 0; x < _sockets.size(); x++){
+            if(_sockets.at(x).first->peerPort()==clientSocket->peerPort()){
+                _sockets.replace(x, std::make_pair(_sockets.at(x).first, msgSnd));
+            }
+        }
+        clientSocket->write(QByteArray(QString("Hello, "+msgSnd).toStdString().c_str()));
+        clientSocket->waitForBytesWritten(3000);
+    }else{ // Se vem o nome de uma pessoa conectada, procura qual socket está conectado com aquele nome e envia
+        for(int x = 0; x < _sockets.size(); x++){
+            if(_sockets.at(x).second==neededWord){
+                sendMsg(msg,_sockets.at(x).first);
+            }
+        }
+        std::cout<<"entrei else"<<std::endl;
+        clientSocket->waitForBytesWritten(3000);
     }
-    printf("entrei");
+
 
 }
 
@@ -108,8 +102,8 @@ void Server::broadcast(QString msg)
 
     // Erasing non-connected sockets
     for(int x = 0; x < _sockets.size(); x++){
-        if(_sockets.at(x)->state() == QAbstractSocket::UnconnectedState){
-            QTcpSocket *socket = _sockets.at(x);
+        if(_sockets.at(x).first->state() == QAbstractSocket::UnconnectedState){
+            QTcpSocket *socket = _sockets.at(x).first;
             _sockets.removeAt(x);
             delete socket;
             x--;
@@ -117,7 +111,7 @@ void Server::broadcast(QString msg)
     }
 
     for(int x = 0; x < _sockets.size(); x++){
-        socket =_sockets.at(x);
+        socket =_sockets.at(x).first;
         sendMsg(msg, socket);
     }
 
