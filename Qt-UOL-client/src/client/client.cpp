@@ -16,7 +16,17 @@ void Client::onConnected(){
 }
 
 void Client::onReadyRead(){
-    QByteArray data = _socket->readAll();
+    QString data(_socket->readAll());
+    QStringList listWords = data.split(":");
+    if(listWords.value(1)=="listaNomes"){
+        listWords.removeAt(0);
+        listWords.removeAt(0);
+        listNames = new QStringList("broadcast");
+        for(auto it = listWords.begin(); it != listWords.end(); ++it)
+            listNames->append(listWords); //contem a lista dos nomes que devem aparecer no campo destino
+
+    }
+
     std::cout << data.toStdString() << std::endl;
 }
 

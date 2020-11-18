@@ -19,6 +19,7 @@ public slots:
 private:
     QTcpSocket *_socket;
     QString _name;
+    QStringList *listNames;
 };
 
 #endif // CLIENT_H

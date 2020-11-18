@@ -70,13 +70,18 @@ void Server::rcvMsg(QObject *socket){
         broadcast(msgSnd);
     }else if(neededWord.contains("config")){ // se vem uma mensagem de config, faz a atribuição do nome ao socket
         std::cout<<"entrei config"<<std::endl;
+
+        QString listaNomes(":listaNomes:");
         for(int x = 0; x < _sockets.size(); x++){
+            if(_sockets.at(x).second!="") listaNomes+=_sockets.at(x).second+":";
+
             if(_sockets.at(x).first->peerPort()==clientSocket->peerPort()){
                 _sockets.replace(x, std::make_pair(_sockets.at(x).first, msgSnd));
+               listaNomes+=_sockets.at(x).second+":";
             }
         }
-        clientSocket->write(QByteArray(QString("Hello, "+msgSnd).toStdString().c_str()));
-        clientSocket->waitForBytesWritten(3000);
+        broadcast(listaNomes);
+
     }else{ // Se vem o nome de uma pessoa conectada, procura qual socket está conectado com aquele nome e envia
         for(int x = 0; x < _sockets.size(); x++){
             if(_sockets.at(x).second==neededWord){
