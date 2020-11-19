@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>assets/online.png</file>
+        <file>assets/broadcast.png</file>
+    </qresource>
+</RCC>

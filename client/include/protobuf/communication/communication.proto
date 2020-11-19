@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+message ServerMessage {
+    string serverMessage     = 1;
+    string sender            = 2;
+    bool   isPrivateSender   = 3;
+    repeated string connectedClients  = 4;
+}
+
+message ClientMessage {
+    string clientMessage = 1;
+    string clientName    = 2;
+    bool   isPrivate     = 3;
+    string rcvName       = 4;
+}

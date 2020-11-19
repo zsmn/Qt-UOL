@@ -1,6 +1,5 @@
+QT -= gui
 QT += network
-QT += core gui
-QT    += widgets
 
 CONFIG += c++11 console
 CONFIG -= app_bundle
@@ -10,6 +9,7 @@ CONFIG -= app_bundle
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
+LIBS *= -lprotobuf
 
 # You can also make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -17,9 +17,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        login.cpp \
+        include/communication.pb.cc \
         main.cpp \
-        src/client/client.cpp
+        src/server.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -27,8 +27,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    login.h \
-    src/client/client.h
-
-FORMS += \
-    login.ui
+    include/communication.pb.h \
+    src/server.h
