@@ -9,12 +9,13 @@ sudo apt install qt5-default
 
 ```bash
 cd Qt-UOL
-cd Qt-UOL-Server
+cd server
+sh protobuf.sh
 mkdir build
 cd build
 qmake ..
 make
-./Qt-UOL-Server
+./server
 ```
 
 
@@ -22,12 +23,13 @@ make
 
 ```bash
 cd Qt-UOL
-cd Qt-UOL-client
+cd client
+sh protobuf.sh
 mkdir build
 cd build
 qmake ..
 make
-./Qt-UOL-client
+./client
 ```
 
 
