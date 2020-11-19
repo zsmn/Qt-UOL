@@ -4,6 +4,7 @@
 #include <QTcpSocket>
 #include <QHostAddress>
 #include <include/communication.pb.h>
+#include <iostream>
 
 class Client : public QObject
 {
